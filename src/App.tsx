@@ -1,19 +1,82 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 // PACE brand purple
 const PACE_PURPLE = "#5C52E8";
 const PACE_PURPLE_DARK = "#4840C4";
 
+// ✅ Vite env
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+
 export default function App() {
+  const supabase = useMemo(() => {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }, []);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+
   const [submitted, setSubmitted] = useState(false);
   const [focusName, setFocusName] = useState(false);
   const [focusEmail, setFocusEmail] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name && email) setSubmitted(true);
+    setErrorMsg(null);
+
+    // ✅ validação simples
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanName || !cleanEmail) {
+      setErrorMsg("Preencha nome e email.");
+      return;
+    }
+
+    if (!supabase) {
+      setErrorMsg("Supabase não configurado. Verifique VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.from("waitlist").insert([
+        {
+          name: cleanName,
+          email: cleanEmail,
+        },
+      ]);
+
+      if (error) {
+        // email duplicado (unique constraint) geralmente vem como 23505
+        // mas pode variar o texto conforme contexto
+        const msg = String(error.message || "");
+        if (error.code === "23505" || msg.toLowerCase().includes("duplicate")) {
+          setErrorMsg("Esse email já está na lista 🙂");
+          setSubmitted(true); // opcional: você pode decidir se mostra o “obrigado”
+          return;
+        }
+
+        if (msg.toLowerCase().includes("row level security")) {
+          setErrorMsg("Bloqueado por RLS. Crie uma policy de INSERT para anon/public na tabela waitlist.");
+          return;
+        }
+
+        setErrorMsg(`Erro ao salvar: ${error.message}`);
+        return;
+      }
+
+      setSubmitted(true);
+      setName("");
+      setEmail("");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,7 +104,7 @@ export default function App() {
           position: relative;
         }
 
-        /* ✅ Logo agora fica DENTRO do container, não absolute na página */
+        /* ✅ Logo preso ao container (responsivo) */
         .topbar {
           grid-column: 1 / -1;
           display: flex;
@@ -76,7 +139,7 @@ export default function App() {
 
         .headlineLine {
           display: block;
-          white-space: nowrap;   /* desktop wide */
+          white-space: nowrap; /* desktop wide */
         }
 
         .sub {
@@ -130,7 +193,7 @@ export default function App() {
       `}</style>
 
       <div className="wrap">
-        {/* ✅ Top-left brand (responsivo, preso ao container) */}
+        {/* ✅ Top-left brand */}
         <div className="topbar">
           <img
             src="/PaceLogo.png"
@@ -148,7 +211,6 @@ export default function App() {
 
         {/* ─── LEFT SIDE ─── */}
         <div className="left">
-          {/* Headline + Subheadline */}
           <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
             <h1 className="headline">
               <span className="headlineLine">O mundo tira seu foco.</span>
@@ -157,7 +219,6 @@ export default function App() {
             <p className="sub">Organize seu foco. Evolua no seu ritmo.</p>
           </div>
 
-          {/* Form */}
           {!submitted ? (
             <form onSubmit={handleSubmit} className="form">
               <input
@@ -206,25 +267,37 @@ export default function App() {
 
               <button
                 type="submit"
+                disabled={loading}
                 style={{
                   padding: "14px 24px",
                   borderRadius: "10px",
-                  background: PACE_PURPLE,
+                  background: loading ? "#6E66EE" : PACE_PURPLE,
                   color: "#FFFFFF",
                   border: "none",
                   fontSize: "15px",
                   fontWeight: 500,
-                  cursor: "pointer",
+                  cursor: loading ? "not-allowed" : "pointer",
                   letterSpacing: "-0.01em",
                   fontFamily: "inherit",
                   transition: "background 0.2s",
                   marginTop: "4px",
+                  opacity: loading ? 0.9 : 1,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = PACE_PURPLE_DARK)}
-                onMouseLeave={(e) => (e.currentTarget.style.background = PACE_PURPLE)}
+                onMouseEnter={(e) => {
+                  if (!loading) e.currentTarget.style.background = PACE_PURPLE_DARK;
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) e.currentTarget.style.background = PACE_PURPLE;
+                }}
               >
-                Entrar na lista de espera
+                {loading ? "Entrando..." : "Entrar na lista de espera"}
               </button>
+
+              {errorMsg && (
+                <p style={{ margin: "8px 0 0", color: "#B42318", fontSize: 13 }}>
+                  {errorMsg}
+                </p>
+              )}
 
               <p
                 style={{
@@ -273,6 +346,12 @@ export default function App() {
               <p style={{ fontSize: "13px", color: "#7A7872", margin: "6px 0 0" }}>
                 Avisaremos assim que o PACE estiver pronto.
               </p>
+
+              {errorMsg && (
+                <p style={{ margin: "10px 0 0", color: "#B42318", fontSize: 13 }}>
+                  {errorMsg}
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -295,8 +374,7 @@ function IPhoneMock({ imageSrc }: { imageSrc: string }) {
           aspectRatio: "272 / 572",
           borderRadius: "50px",
           background: "#1A1A1E",
-          boxShadow:
-            "0 0 0 1px #38383C, 0 48px 96px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.05)",
+          boxShadow: "0 0 0 1px #38383C, 0 48px 96px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.05)",
           position: "relative",
           padding: "14px",
           display: "flex",
@@ -306,50 +384,10 @@ function IPhoneMock({ imageSrc }: { imageSrc: string }) {
         }}
       >
         {/* Side buttons */}
-        <div
-          style={{
-            position: "absolute",
-            left: "-3px",
-            top: "118px",
-            width: "3px",
-            height: "34px",
-            background: "#38383C",
-            borderRadius: "2px 0 0 2px",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: "-3px",
-            top: "166px",
-            width: "3px",
-            height: "54px",
-            background: "#38383C",
-            borderRadius: "2px 0 0 2px",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: "-3px",
-            top: "232px",
-            width: "3px",
-            height: "54px",
-            background: "#38383C",
-            borderRadius: "2px 0 0 2px",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            right: "-3px",
-            top: "158px",
-            width: "3px",
-            height: "78px",
-            background: "#38383C",
-            borderRadius: "0 2px 2px 0",
-          }}
-        />
+        <div style={{ position: "absolute", left: "-3px", top: "118px", width: "3px", height: "34px", background: "#38383C", borderRadius: "2px 0 0 2px" }} />
+        <div style={{ position: "absolute", left: "-3px", top: "166px", width: "3px", height: "54px", background: "#38383C", borderRadius: "2px 0 0 2px" }} />
+        <div style={{ position: "absolute", left: "-3px", top: "232px", width: "3px", height: "54px", background: "#38383C", borderRadius: "2px 0 0 2px" }} />
+        <div style={{ position: "absolute", right: "-3px", top: "158px", width: "3px", height: "78px", background: "#38383C", borderRadius: "0 2px 2px 0" }} />
 
         {/* Screen */}
         <div
@@ -375,24 +413,16 @@ function IPhoneMock({ imageSrc }: { imageSrc: string }) {
               zIndex: 3,
             }}
           >
-            <div
-              style={{
-                width: "88px",
-                height: "26px",
-                background: "#1A1A1E",
-                borderRadius: "20px",
-              }}
-            />
+            <div style={{ width: "88px", height: "26px", background: "#1A1A1E", borderRadius: "20px" }} />
           </div>
 
-          {/* ✅ Logo overlay corrigido:
-              - não usa "height: 86px"
-              - posiciona em relação ao topo real da tela, sem empurrar conteúdo
-              - com background “transparente”, sem criar faixa */}
+          {/* ✅ Logo overlay mais “centralizado” na faixa superior:
+              - a referência é a área acima do primeiro card
+              - só mexa no top/left pra ajuste fino */}
           <div
             style={{
               position: "absolute",
-              top: 22,
+              top: 25,
               left: 20,
               zIndex: 4,
               pointerEvents: "none",
