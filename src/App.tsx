@@ -392,8 +392,8 @@ function IPhoneMock({ imageSrc }: { imageSrc: string }) {
           <div
             style={{
               position: "absolute",
-              top: 10,
-              left: 16,
+              top: 22,
+              left: 20,
               zIndex: 4,
               pointerEvents: "none",
             }}
