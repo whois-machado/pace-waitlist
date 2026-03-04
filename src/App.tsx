@@ -245,7 +245,7 @@ export default function App() {
 
               <input
                 type="email"
-                placeholder="Seu melhor email"
+                placeholder="Seu email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
