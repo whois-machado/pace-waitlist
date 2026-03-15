@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const PACE_PURPLE = "#5C52E8";
-const PACE_PURPLE_DARK = "#4840C4";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
