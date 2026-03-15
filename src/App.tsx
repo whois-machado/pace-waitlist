@@ -1,11 +1,9 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// PACE brand purple
 const PACE_PURPLE = "#5C52E8";
 const PACE_PURPLE_DARK = "#4840C4";
 
-// ✅ Vite env
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
@@ -17,11 +15,9 @@ export default function App() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-
   const [submitted, setSubmitted] = useState(false);
   const [focusName, setFocusName] = useState(false);
   const [focusEmail, setFocusEmail] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -29,7 +25,6 @@ export default function App() {
     e.preventDefault();
     setErrorMsg(null);
 
-    // ✅ validação simples
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
 
@@ -39,11 +34,12 @@ export default function App() {
     }
 
     if (!supabase) {
-      setErrorMsg("Supabase não configurado. Verifique VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
+      setErrorMsg("Supabase não configurado.");
       return;
     }
 
     setLoading(true);
+
     try {
       const { error } = await supabase.from("waitlist").insert([
         {
@@ -53,21 +49,7 @@ export default function App() {
       ]);
 
       if (error) {
-        // email duplicado (unique constraint) geralmente vem como 23505
-        // mas pode variar o texto conforme contexto
-        const msg = String(error.message || "");
-        if (error.code === "23505" || msg.toLowerCase().includes("duplicate")) {
-          setErrorMsg("Esse email já está na lista 🙂");
-          setSubmitted(true); // opcional: você pode decidir se mostra o “obrigado”
-          return;
-        }
-
-        if (msg.toLowerCase().includes("row level security")) {
-          setErrorMsg("Bloqueado por RLS. Crie uma policy de INSERT para anon/public na tabela waitlist.");
-          return;
-        }
-
-        setErrorMsg(`Erro ao salvar: ${error.message}`);
+        setErrorMsg(error.message);
         return;
       }
 
@@ -82,379 +64,151 @@ export default function App() {
   return (
     <div
       style={{
-        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+        fontFamily: "Inter, system-ui",
         background: "#F4F3F0",
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        overflowX: "hidden",
         padding: "48px 16px",
       }}
     >
-      <style>{`
-        .wrap {
-          width: 100%;
-          max-width: 1040px;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 96px;
-          align-items: center;
-          padding: 0 48px;
-          position: relative;
-        }
-
-        /* ✅ Logo preso ao container (responsivo) */
-        .topbar {
-          grid-column: 1 / -1;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          user-select: none;
-          margin-bottom: 14px;
-        }
-
-        .brandWord {
-          font-size: 20px;
-          letter-spacing: 0.16em;
-          color: #1A1A1A;
-          text-transform: uppercase;
-          font-weight: 700;
-        }
-
-        .left {
-          display: flex;
-          flex-direction: column;
-          gap: 40px;
-        }
-
-        .headline {
-          font-size: clamp(34px, 3.8vw, 52px);
-          font-weight: 700;
-          color: #111111;
-          line-height: 1.13;
-          letter-spacing: -0.04em;
-          margin: 0;
-        }
-
-        .headlineLine {
-          display: block;
-          white-space: nowrap; /* desktop wide */
-        }
-
-        .sub {
-          font-size: clamp(14px, 1.2vw, 16px);
-          color: #7A7872;
-          margin: 0;
-          font-weight: 400;
-          letter-spacing: -0.01em;
-          line-height: 1.65;
-        }
-
-        .form {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          max-width: 520px;
-        }
-
-        .iphoneWrap {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        /* ✅ Evita overflow em telas intermediárias */
-        @media (max-width: 1100px) {
-          .headlineLine { white-space: normal; }
-        }
-
-        /* ✅ Mobile layout */
-        @media (max-width: 920px) {
-          .wrap {
-            grid-template-columns: 1fr;
-            gap: 48px;
-            padding: 0 16px;
-          }
-
-          .topbar {
-            margin-bottom: 6px;
-          }
-
-          .left {
-            align-items: center;
-            text-align: center;
-          }
-
-          .form {
-            width: 100%;
-          }
-        }
-      `}</style>
-
-      <div className="wrap">
-        {/* ✅ Top-left brand */}
-        <div className="topbar">
-          <img
-            src="/PaceLogo.png"
-            alt="PACE"
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 10,
-              display: "block",
-            }}
-            draggable={false}
-          />
-          <span className="brandWord">PACE</span>
-        </div>
-
-        {/* ─── LEFT SIDE ─── */}
-        <div className="left">
-          <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-            <h1 className="headline">
-              <span className="headlineLine">O mundo tira seu foco.</span>
-              <span className="headlineLine">O PACE devolve.</span>
-            </h1>
-            <p className="sub">Organize seu foco. Evolua no seu ritmo.</p>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 1040,
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 96,
+          alignItems: "center",
+        }}
+      >
+        {/* LEFT SIDE */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <img src="/PaceLogo.png" width={48} />
+            <span
+              style={{
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+              }}
+            >
+              PACE
+            </span>
           </div>
 
+          <h1
+            style={{
+              fontSize: 48,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            O mundo tira seu foco.
+            <br />
+            O PACE devolve.
+          </h1>
+
+          <p style={{ color: "#7A7872" }}>
+            Organize seu foco. Evolua no seu ritmo.
+          </p>
+
           {!submitted ? (
-            <form onSubmit={handleSubmit} className="form">
+            <form
+              onSubmit={handleSubmit}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                maxWidth: 420,
+              }}
+            >
               <input
-                type="text"
                 placeholder="Seu nome"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                required
-                style={{
-                  padding: "13px 17px",
-                  borderRadius: "10px",
-                  border: `1.5px solid ${focusName ? PACE_PURPLE : "#DDD9D0"}`,
-                  background: "#FAFAF7",
-                  color: "#111111",
-                  fontSize: "15px",
-                  outline: "none",
-                  transition: "border-color 0.2s",
-                  fontFamily: "inherit",
-                  fontWeight: 400,
-                }}
                 onFocus={() => setFocusName(true)}
                 onBlur={() => setFocusName(false)}
+                style={{
+                  padding: 14,
+                  borderRadius: 10,
+                  border: `1.5px solid ${
+                    focusName ? PACE_PURPLE : "#DDD9D0"
+                  }`,
+                  background: "#FAFAF7",
+                }}
               />
 
               <input
-                type="email"
                 placeholder="Seu email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{
-                  padding: "13px 17px",
-                  borderRadius: "10px",
-                  border: `1.5px solid ${focusEmail ? PACE_PURPLE : "#DDD9D0"}`,
-                  background: "#FAFAF7",
-                  color: "#111111",
-                  fontSize: "15px",
-                  outline: "none",
-                  transition: "border-color 0.2s",
-                  fontFamily: "inherit",
-                  fontWeight: 400,
-                }}
                 onFocus={() => setFocusEmail(true)}
                 onBlur={() => setFocusEmail(false)}
+                style={{
+                  padding: 14,
+                  borderRadius: 10,
+                  border: `1.5px solid ${
+                    focusEmail ? PACE_PURPLE : "#DDD9D0"
+                  }`,
+                  background: "#FAFAF7",
+                }}
               />
 
               <button
                 type="submit"
                 disabled={loading}
                 style={{
-                  padding: "14px 24px",
-                  borderRadius: "10px",
-                  background: loading ? "#6E66EE" : PACE_PURPLE,
-                  color: "#FFFFFF",
+                  padding: 14,
+                  borderRadius: 10,
+                  background: PACE_PURPLE,
+                  color: "#fff",
                   border: "none",
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  letterSpacing: "-0.01em",
-                  fontFamily: "inherit",
-                  transition: "background 0.2s",
-                  marginTop: "4px",
-                  opacity: loading ? 0.9 : 1,
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.currentTarget.style.background = PACE_PURPLE_DARK;
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) e.currentTarget.style.background = PACE_PURPLE;
+                  cursor: "pointer",
                 }}
               >
                 {loading ? "Entrando..." : "Entrar na lista de espera"}
               </button>
 
               {errorMsg && (
-                <p style={{ margin: "8px 0 0", color: "#B42318", fontSize: 13 }}>
-                  {errorMsg}
-                </p>
+                <p style={{ color: "red", fontSize: 13 }}>{errorMsg}</p>
               )}
-
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "#B0ACA4",
-                  margin: "2px 0 0",
-                  letterSpacing: "0.01em",
-                  textAlign: "center",
-                }}
-              >
-                Beta privado. Sem spam.
-              </p>
             </form>
           ) : (
-            <div
-              style={{
-                padding: "28px 24px",
-                borderRadius: "12px",
-                background: "#FAFAF7",
-                border: "1.5px solid #DDD9D0",
-                textAlign: "center",
-                maxWidth: "520px",
-                width: "100%",
-                margin: "0 auto",
-              }}
-            >
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  background: PACE_PURPLE,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 14px",
-                  color: "#fff",
-                  fontSize: "18px",
-                }}
-              >
-                ✓
-              </div>
-              <p style={{ fontSize: "15px", color: "#111111", margin: 0, fontWeight: 500 }}>
-                Muito Obrigado!
-              </p>
-              <p style={{ fontSize: "13px", color: "#7A7872", margin: "6px 0 0" }}>
-                Avisaremos assim que o PACE estiver pronto.
-              </p>
-
-              {errorMsg && (
-                <p style={{ margin: "10px 0 0", color: "#B42318", fontSize: 13 }}>
-                  {errorMsg}
-                </p>
-              )}
-            </div>
+            <p>Obrigado! Avisaremos quando o PACE lançar.</p>
           )}
         </div>
 
-        {/* ─── RIGHT SIDE — iPhone Mockup com seu print ─── */}
-        <div className="iphoneWrap">
-          <IPhoneMock imageSrc="/home.png" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function IPhoneMock({ imageSrc }: { imageSrc: string }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div
-        style={{
-          width: "min(300px, 82vw)",
-          aspectRatio: "272 / 572",
-          borderRadius: "50px",
-          background: "#1A1A1E",
-          boxShadow: "0 0 0 1px #38383C, 0 48px 96px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.05)",
-          position: "relative",
-          padding: "14px",
-          display: "flex",
-          flexDirection: "column",
-          transform: "scaleY(0.965)",
-          transformOrigin: "top",
-        }}
-      >
-        {/* Side buttons */}
-        <div style={{ position: "absolute", left: "-3px", top: "118px", width: "3px", height: "34px", background: "#38383C", borderRadius: "2px 0 0 2px" }} />
-        <div style={{ position: "absolute", left: "-3px", top: "166px", width: "3px", height: "54px", background: "#38383C", borderRadius: "2px 0 0 2px" }} />
-        <div style={{ position: "absolute", left: "-3px", top: "232px", width: "3px", height: "54px", background: "#38383C", borderRadius: "2px 0 0 2px" }} />
-        <div style={{ position: "absolute", right: "-3px", top: "158px", width: "3px", height: "78px", background: "#38383C", borderRadius: "0 2px 2px 0" }} />
-
-        {/* Screen */}
-        <div
-          style={{
-            flex: 1,
-            borderRadius: "38px",
-            background: "#F5F4FB",
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-          }}
-        >
-          {/* Dynamic Island */}
+        {/* RIGHT SIDE PHONE */}
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <div
             style={{
-              height: 44,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              background: "#F5F4FB",
-              position: "relative",
-              zIndex: 3,
+              width: 300,
+              aspectRatio: "272 / 572",
+              borderRadius: 50,
+              background: "#1A1A1E",
+              padding: 14,
+              boxShadow: "0 40px 80px rgba(0,0,0,0.25)",
             }}
           >
-            <div style={{ width: "88px", height: "26px", background: "#1A1A1E", borderRadius: "20px" }} />
-          </div>
-
-          {/* ✅ Logo overlay mais “centralizado” na faixa superior:
-              - a referência é a área acima do primeiro card
-              - só mexa no top/left pra ajuste fino */}
-          <div
-            style={{
-              position: "absolute",
-              top: 25,
-              left: 20,
-              zIndex: 4,
-              pointerEvents: "none",
-            }}
-          >
-            <img
-              src="/PaceLogo.png"
-              alt="PACE"
+            <div
               style={{
-                width: 28,
-                height: 28,
-                borderRadius: 8,
-                display: "block",
-              }}
-              draggable={false}
-            />
-          </div>
-
-          {/* Print */}
-          <div style={{ flex: 1, position: "relative" }}>
-            <img
-              src={imageSrc}
-              alt="PACE app preview"
-              style={{
-                width: "100%",
+                borderRadius: 36,
+                overflow: "hidden",
                 height: "100%",
-                objectFit: "cover",
-                display: "block",
-                transform: "translateY(-8px)",
+                position: "relative",
               }}
-              draggable={false}
-            />
+            >
+              {/* MENU SCREEN */}
+              <img
+                src="/menuScreen.png"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
