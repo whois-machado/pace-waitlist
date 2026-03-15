@@ -215,7 +215,7 @@ export default function App() {
           border-radius: 38px;
           overflow: hidden;
           position: relative;
-          background: #F5F4FB;
+          background: #151133;
         }
 
         .phoneImage {
