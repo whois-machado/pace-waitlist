@@ -72,7 +72,7 @@ export default function App() {
     <div
       style={{
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-        background: "#F4F3F0",
+        background: "#F4F5F7", // Fundo levemente mais frio para combinar com o Dark Mode
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
@@ -88,10 +88,10 @@ export default function App() {
 
         .wrap {
           width: 100%;
-          max-width: 1040px;
+          max-width: 1100px;
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 96px;
+          gap: 64px;
           align-items: center;
           padding: 0 48px;
           position: relative;
@@ -103,135 +103,126 @@ export default function App() {
           align-items: center;
           gap: 12px;
           user-select: none;
-          margin-bottom: 14px;
+          margin-bottom: 24px;
         }
 
         .brandWord {
-          font-size: 20px;
+          font-size: 22px;
           letter-spacing: 0.16em;
           color: #1A1A1A;
           text-transform: uppercase;
-          font-weight: 700;
+          font-weight: 800;
         }
 
         .left {
           display: flex;
           flex-direction: column;
-          gap: 40px;
+          gap: 36px;
         }
 
         .headline {
-          font-size: clamp(34px, 3.8vw, 52px);
-          font-weight: 700;
+          font-size: clamp(38px, 4vw, 50px);
+          font-weight: 800;
           color: #111111;
-          line-height: 1.13;
+          line-height: 1.1;
           letter-spacing: -0.04em;
           margin: 0;
         }
 
         .headlineLine {
           display: block;
-          white-space: nowrap;
+        }
+
+        .highlight {
+          color: ${PACE_PURPLE};
         }
 
         .sub {
-          font-size: clamp(14px, 1.2vw, 16px);
-          color: #7A7872;
+          font-size: clamp(16px, 1.2vw, 18px);
+          color: #666666;
           margin: 0;
           font-weight: 400;
           letter-spacing: -0.01em;
-          line-height: 1.65;
-          max-width: 520px;
+          line-height: 1.6;
+          max-width: 480px;
         }
 
         .form {
           display: flex;
           flex-direction: column;
-          gap: 10px;
-          max-width: 520px;
+          gap: 12px;
+          max-width: 480px;
           width: 100%;
         }
 
         .input {
-          padding: 14px 16px;
+          padding: 16px 18px;
           border-radius: 12px;
-          background: #FAFAF7;
-          font-size: 15px;
+          background: #FFFFFF;
+          font-size: 16px;
           font-family: inherit;
-          border: 1.5px solid #DDD9D0;
+          border: 1.5px solid #E5E5E5;
           outline: none;
           width: 100%;
-          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        
+        .input::placeholder {
+          color: #A0A0A0;
         }
 
         .submitBtn {
-          padding: 14px 24px;
+          padding: 16px 24px;
           border-radius: 12px;
           background: ${PACE_PURPLE};
           color: #FFFFFF;
           border: none;
-          font-size: 15px;
+          font-size: 16px;
           font-weight: 600;
           cursor: pointer;
-          letter-spacing: -0.01em;
+          letter-spacing: 0.02em;
           font-family: inherit;
-          margin-top: 4px;
-          transition: transform 0.18s ease, opacity 0.18s ease;
+          margin-top: 8px;
+          transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease;
+          box-shadow: 0 8px 16px rgba(92, 82, 232, 0.25);
         }
 
         .submitBtn:hover {
-          opacity: 0.96;
+          opacity: 0.92;
+          box-shadow: 0 12px 20px rgba(92, 82, 232, 0.3);
         }
 
         .submitBtn:active {
-          transform: scale(0.985);
+          transform: translateY(2px);
+          box-shadow: 0 4px 8px rgba(92, 82, 232, 0.2);
         }
 
-        .iphoneWrap {
+        .imageWrap {
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-
-        .phoneShell {
-          width: min(300px, 82vw);
-          aspect-ratio: 272 / 572;
-          border-radius: 50px;
-          background: #1A1A1E;
-          box-shadow:
-            0 0 0 1px #38383C,
-            0 48px 96px rgba(0,0,0,0.22),
-            inset 0 0 0 1px rgba(255,255,255,0.05);
           position: relative;
-          padding: 14px;
-          display: flex;
-          flex-direction: column;
-          transform: scaleY(0.965);
-          transform-origin: top;
         }
 
-        .phoneScreen {
-          flex: 1;
-          border-radius: 38px;
-          overflow: hidden;
-          position: relative;
-          background: #151133;
-        }
-
-        .phoneImage {
+        .mockupImage {
           width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
+          max-width: 360px;
+          height: auto;
+          filter: drop-shadow(0px 24px 48px rgba(0, 0, 0, 0.12));
+          animation: float 6s ease-in-out infinite;
+        }
+
+        /* Animação suave de flutuação */
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-16px); }
+          100% { transform: translateY(0px); }
         }
 
         @media (max-width: 1100px) {
-          .headlineLine {
-            white-space: normal;
-          }
-
           .wrap {
-            gap: 64px;
+            gap: 48px;
             padding: 0 24px;
           }
         }
@@ -239,12 +230,13 @@ export default function App() {
         @media (max-width: 920px) {
           .wrap {
             grid-template-columns: 1fr;
-            gap: 48px;
-            padding: 0 12px;
+            gap: 56px;
+            padding: 0 16px;
           }
 
           .topbar {
-            margin-bottom: 8px;
+            justify-content: center;
+            margin-bottom: 0px;
           }
 
           .left {
@@ -261,33 +253,23 @@ export default function App() {
             max-width: 100%;
           }
 
-          .iphoneWrap {
+          .imageWrap {
             order: 2;
+          }
+          
+          .mockupImage {
+            max-width: 300px; /* Um pouco menor no mobile */
           }
         }
 
         @media (max-width: 640px) {
           .wrap {
-            gap: 36px;
-            padding: 0 4px;
-          }
-
-          .brandWord {
-            font-size: 18px;
+            gap: 40px;
+            padding: 0 8px;
           }
 
           .headline {
-            font-size: clamp(32px, 11vw, 48px);
-            line-height: 1.08;
-          }
-
-          .sub {
-            font-size: 15px;
-            line-height: 1.55;
-          }
-
-          .phoneShell {
-            width: min(320px, 92vw);
+            font-size: clamp(34px, 10vw, 42px);
           }
         }
       `}</style>
@@ -298,8 +280,8 @@ export default function App() {
             src="/PaceLogo.png"
             alt="PACE"
             style={{
-              width: 50,
-              height: 50,
+              width: 44,
+              height: 44,
               borderRadius: 10,
               display: "block",
             }}
@@ -309,12 +291,14 @@ export default function App() {
         </div>
 
         <div className="left">
-          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <h1 className="headline">
-              <span className="headlineLine">O mundo tira seu foco.</span>
-              <span className="headlineLine">O PACE devolve.</span>
+              <span className="headlineLine">Pare de planejar.</span>
+              <span className="headlineLine">Comece a executar.</span>
             </h1>
-            <p className="sub">Organize seu foco. Evolua no seu ritmo.</p>
+            <p className="sub">
+              O PACE é o seu cockpit de alta performance. Unifique tarefas, hábitos e agenda em um único ecossistema inteligente.
+            </p>
           </div>
 
           {!submitted ? (
@@ -327,138 +311,96 @@ export default function App() {
                 onFocus={() => setFocusName(true)}
                 onBlur={() => setFocusName(false)}
                 style={{
-                  borderColor: focusName ? PACE_PURPLE : "#DDD9D0",
-                  boxShadow: focusName ? "0 0 0 3px rgba(92,82,232,0.08)" : "none",
+                  borderColor: focusName ? PACE_PURPLE : "#E5E5E5",
+                  boxShadow: focusName ? "0 0 0 3px rgba(92,82,232,0.1)" : "0 2px 4px rgba(0,0,0,0.02)",
                 }}
               />
 
               <input
                 className="input"
                 placeholder="Seu email"
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onFocus={() => setFocusEmail(true)}
                 onBlur={() => setFocusEmail(false)}
                 style={{
-                  borderColor: focusEmail ? PACE_PURPLE : "#DDD9D0",
-                  boxShadow: focusEmail ? "0 0 0 3px rgba(92,82,232,0.08)" : "none",
+                  borderColor: focusEmail ? PACE_PURPLE : "#E5E5E5",
+                  boxShadow: focusEmail ? "0 0 0 3px rgba(92,82,232,0.1)" : "0 2px 4px rgba(0,0,0,0.02)",
                 }}
               />
 
               <button className="submitBtn" type="submit" disabled={loading}>
-                {loading ? "Entrando..." : "Entrar na lista de espera"}
+                {loading ? "Entrando..." : "Garantir meu acesso antecipado"}
               </button>
 
               {errorMsg && (
-                <p style={{ margin: "8px 0 0", color: "#B42318", fontSize: 13 }}>
+                <p style={{ margin: "8px 0 0", color: "#B42318", fontSize: 13, fontWeight: 500 }}>
                   {errorMsg}
                 </p>
               )}
 
               <p
                 style={{
-                  fontSize: 12,
-                  color: "#B0ACA4",
-                  margin: "2px 0 0",
-                  letterSpacing: "0.01em",
+                  fontSize: 13,
+                  color: "#A0A0A0",
+                  margin: "6px 0 0",
                   textAlign: "center",
                 }}
               >
-                Beta privado. Sem spam.
+                Vagas limitadas no Beta Privado. Sem spam.
               </p>
             </form>
           ) : (
             <div
               style={{
-                padding: "28px 24px",
-                borderRadius: "12px",
-                background: "#FAFAF7",
-                border: "1.5px solid #DDD9D0",
+                padding: "32px 24px",
+                borderRadius: "16px",
+                background: "#FFFFFF",
+                border: "1px solid #E5E5E5",
+                boxShadow: "0 12px 24px rgba(0,0,0,0.04)",
                 textAlign: "center",
-                maxWidth: "520px",
+                maxWidth: "480px",
                 width: "100%",
                 margin: "0 auto",
               }}
             >
               <div
                 style={{
-                  width: 40,
-                  height: 40,
+                  width: 48,
+                  height: 48,
                   borderRadius: "50%",
                   background: PACE_PURPLE,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "0 auto 14px",
+                  margin: "0 auto 16px",
                   color: "#fff",
-                  fontSize: 18,
+                  fontSize: 20,
+                  boxShadow: "0 8px 16px rgba(92, 82, 232, 0.25)",
                 }}
               >
                 ✓
               </div>
 
-              <p style={{ fontSize: 15, color: "#111111", margin: 0, fontWeight: 500 }}>
-                Muito Obrigado!
+              <p style={{ fontSize: 18, color: "#111111", margin: 0, fontWeight: 700 }}>
+                Lugar garantido!
               </p>
 
-              <p style={{ fontSize: 13, color: "#7A7872", margin: "6px 0 0" }}>
-                Avisaremos assim que o PACE estiver pronto.
+              <p style={{ fontSize: 15, color: "#666666", margin: "8px 0 0", lineHeight: 1.5 }}>
+                Avisaremos no seu e-mail assim que o PACE estiver liberado para você. Prepare-se.
               </p>
             </div>
           )}
         </div>
 
-        <div className="iphoneWrap">
-          <div className="phoneShell">
-            <div
-              style={{
-                position: "absolute",
-                left: "-3px",
-                top: "118px",
-                width: 3,
-                height: 34,
-                background: "#38383C",
-                borderRadius: "2px 0 0 2px",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                left: "-3px",
-                top: "166px",
-                width: 3,
-                height: 54,
-                background: "#38383C",
-                borderRadius: "2px 0 0 2px",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                left: "-3px",
-                top: "232px",
-                width: 3,
-                height: 54,
-                background: "#38383C",
-                borderRadius: "2px 0 0 2px",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                right: "-3px",
-                top: "158px",
-                width: 3,
-                height: 78,
-                background: "#38383C",
-                borderRadius: "0 2px 2px 0",
-              }}
-            />
-
-            <div className="phoneScreen">
-              <img src="/menuScreen.png" alt="PACE menu preview" className="phoneImage" />
-            </div>
-          </div>
+        {/* Aqui substituímos a carcaça complexa pela imagem pura flutuante */}
+        <div className="imageWrap">
+          <img 
+            src="public/homeWaitlist.png" 
+            alt="PACE App Preview" 
+            className="mockupImage" 
+          />
         </div>
       </div>
     </div>
