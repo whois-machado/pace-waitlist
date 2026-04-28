@@ -121,7 +121,7 @@ export default function App() {
         }
 
         .headline {
-          font-size: clamp(38px, 4vw, 50px);
+          font-size: clamp(35px, 4vw, 50px);
           font-weight: 800;
           color: #111111;
           line-height: 1.1;
