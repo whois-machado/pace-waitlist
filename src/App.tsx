@@ -265,11 +265,11 @@ export default function App() {
         @media (max-width: 640px) {
           .wrap {
             gap: 40px;
-            padding: 0 8px;
+            padding: 0 12px;
           }
 
           .headline {
-            font-size: clamp(34px, 10vw, 42px);
+            font-size: clamp(28px, 8.5vw, 38px);
           }
         }
       `}</style>
