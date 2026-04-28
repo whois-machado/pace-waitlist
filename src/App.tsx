@@ -397,7 +397,7 @@ export default function App() {
         {/* Aqui substituímos a carcaça complexa pela imagem pura flutuante */}
         <div className="imageWrap">
           <img 
-            src="public/homeWaitlist.png" 
+            src="/homeWaitlist.png" 
             alt="PACE App Preview" 
             className="mockupImage" 
           />
